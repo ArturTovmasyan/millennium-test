@@ -21,7 +21,7 @@ class ProductController extends AbstractController
         $products = $content['products'] ?? [];
 
         if (empty($products)) {
-            return $this->json(['errors' => 'Products array is empty'], Response::HTTP_BAD_REQUEST);
+            return $this->json(['errors' => 'Products is empty'], Response::HTTP_BAD_REQUEST);
         }
 
         $errors = [];
