@@ -1,0 +1,57 @@
+services:
+  php:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: symfony_app
+    ports:
+      - '${PHP_PORT}:9000'
+    volumes:
+      - .:/app
+    environment:
+      - APP_ENV=dev
+    depends_on:
+      - db
+    networks:
+      - symfony_net
+
+  web:
+    image: bitnami/apache:latest
+    container_name: symfony_web
+    restart: always
+    ports:
+      - '${APP_PORT}:8080'
+    volumes:
+      - ./docker/apache/site.conf:/vhosts/site.conf:ro
+      - .:/app
+    depends_on:
+      - php
+    networks:
+      - symfony_net
+
+  db:
+    image: mysql:8.0
+    container_name: symfony_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: symfony
+      MYSQL_USER: symfony
+      MYSQL_PASSWORD: symfony
+    ports:
+      - "${MYSQL_PORT}:3306"
+    networks:
+      - symfony_net
+
+  adminer:
+    image: adminer
+    container_name: symfony-adminer
+    ports:
+      - '${ADMINER_PORT}:8080'  # Change the exposed port here
+    depends_on:
+      - db
+    networks:
+      - symfony_net
+
+networks:
+  symfony_net:
+    driver: bridge
