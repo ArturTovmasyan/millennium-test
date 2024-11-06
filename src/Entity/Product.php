@@ -2,28 +2,31 @@
 
 namespace App\Entity;
 
-use App\Repository\ProductRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: ProductRepository::class)]
-class Products
+#[ORM\Table(name: 'product', indexes: [new ORM\Index(columns: ['title', 'price'], name: 'title_price_idx')])]
+#[ORM\Entity]
+class Product
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id;
+    private int $id;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Assert\Length(min: 1, max: 255)]
-    private ?string $title;
+    #[Assert\Length(max: 255)]
+    private string $title;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    #[Assert\NotBlank]
     #[Assert\Range(min: 0.1, max: 100000)]
-    private ?string $price;
+    private string $price;
+
+    #[ORM\OneToMany(mappedBy: 'product', targetEntity: UserOrder::class, cascade: ['persist'])]
+    private Collection $orders;
 
     public function getId(): int
     {
@@ -52,5 +55,15 @@ class Products
         $this->price = $price;
 
         return $this;
+    }
+
+    public function getOrders(): Collection
+    {
+        return $this->orders;
+    }
+
+    public function setOrders(Collection $orders): void
+    {
+        $this->orders = $orders;
     }
 }

@@ -17,38 +17,38 @@ class UserOrder
     #[ORM\Column]
     private int $id;
 
-    #[ORM\Column]
-    #[Assert\NotBlank]
-    private ?int $userId;
+    #[Assert\NotBlank(message: 'The user cannot be blank.')]
+    #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'orders')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'cascade')]
+    private User $user;
 
-    #[ORM\Column]
-    #[Assert\NotBlank]
-    private ?int $productId;
+    #[Assert\NotBlank(message: 'The product cannot be blank.')]
+    #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'orders')]
+    #[ORM\JoinColumn(name: 'product_id', referencedColumnName: 'id', onDelete: 'cascade')]
+    private Product $product;
 
     public function getId(): int
     {
         return $this->id;
     }
 
-    public function getUserId(): int
+    public function getUser(): User
     {
-        return $this->userId;
+        return $this->user;
     }
 
-    public function getProductId(): int
+    public function setUser(User $user): void
     {
-        return $this->productId;
+        $this->user = $user;
     }
 
-    public function setProductId(int $productId): void
+    public function getProduct(): Product
     {
-        $this->productId = $productId;
+        return $this->product;
     }
 
-    public function setUserId(int $userId): static
+    public function setProduct(Product $product): void
     {
-        $this->userId = $userId;
-
-        return $this;
+        $this->product = $product;
     }
 }

@@ -3,12 +3,12 @@
 namespace App\Entity;
 
 use App\Model\TimeAwareTrait;
-use App\Repository\UserRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Entity]
 class User
 {
     use TimeAwareTrait;
@@ -19,12 +19,12 @@ class User
     private int $id;
 
     #[ORM\Column(length: 64)]
-    #[Assert\Length(min: 1, max: 64)]
+    #[Assert\Length(max: 64)]
     #[Assert\NotBlank]
     private ?string $firstName;
 
     #[ORM\Column(length: 64)]
-    #[Assert\Length(min: 1, max: 64)]
+    #[Assert\Length(max: 64)]
     #[Assert\NotBlank]
     private ?string $secondName;
 
@@ -33,7 +33,15 @@ class User
     #[Assert\NotBlank]
     private ?\DateTimeInterface $birthday;
 
-    public function getId(): ?int
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserOrder::class, cascade: ['persist'])]
+    private Collection $orders;
+
+    public function getFullName(): string
+    {
+        return $this->firstName . ' ' . $this->secondName;
+    }
+
+    public function getId(): int
     {
         return $this->id;
     }
