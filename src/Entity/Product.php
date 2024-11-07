@@ -7,8 +7,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Table(name: 'product', indexes: [new ORM\Index(columns: ['title', 'price'], name: 'title_price_idx')])]
 #[ORM\Entity]
+#[ORM\Index(columns: ['title', 'price'], name: "title_price_idx")]
 class Product
 {
     #[ORM\Id]

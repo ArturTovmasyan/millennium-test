@@ -1,11 +1,14 @@
 APP_CONTAINER_NAME=symfony_app
-DATE := $(shell date +%Y-%m-%d)
 
 # Команда для сборки и запуска контейнеров
 up:
-	@echo "Building the project..."
+	@echo "Building the project via Docker..."
 	@docker compose up -d --build && sleep 2
 	docker exec -it $(APP_CONTAINER_NAME) composer install && sleep 3 && $(MAKE) run-migrations
+
+local:
+	@echo "Building the project in local host environment..."
+	composer install && sleep 3 && $(MAKE) run-migrations
 
 # Команда для запуска проекта
 start:

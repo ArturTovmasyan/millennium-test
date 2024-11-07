@@ -5,11 +5,11 @@ namespace App\Controller\Api;
 use App\Entity\Product;
 use App\Service\ValidatorService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/api/product')]
 class ProductController extends AbstractController
@@ -24,26 +24,26 @@ class ProductController extends AbstractController
             return $this->json(['errors' => 'Products is empty'], Response::HTTP_BAD_REQUEST);
         }
 
-        $errors = [];
-        $isValid = true;
-
         $em->beginTransaction();
 
         try {
-            foreach ($products as $key => $item) {
-                $product = new Product();
-                $product->setTitle($item['title'] ?? '');
-                $product->setPrice($item['price'] ?? 0);
+            $isValid = true;
+            $errors = [];
 
-                // Validate product and collect errors
+            foreach ($products as $key => $item) {
+                $product = (new Product())
+                    ->setTitle($item['title'] ?? '')
+                    ->setPrice($item['price'] ?? 0);
+
                 $validationErrors = $validator->validate($product);
 
                 if ($validationErrors) {
                     $errors[$key] = $validationErrors;
                     $isValid = false;
-                } else {
-                    $em->persist($product);
+                    continue;
                 }
+
+                $em->persist($product);
             }
 
             if ($isValid) {

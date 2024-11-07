@@ -5,10 +5,9 @@ namespace App\Controller\Api;
 use App\Entity\User;
 use App\Entity\UserOrder;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/api/user-orders')]
 class UserOrderController extends AbstractController
@@ -20,7 +19,7 @@ class UserOrderController extends AbstractController
         $user = $em->getRepository(User::class)->find($id);
 
         if (!$user) {
-            throw new NotFoundHttpException("User with ID $id not found");
+            throw $this->createNotFoundException("User with ID $id not found");
         }
 
         $orders = $em->getRepository(UserOrder::class)->findOrdersByUser($id);
@@ -30,6 +29,6 @@ class UserOrderController extends AbstractController
             'orders' => $orders
         ];
 
-        return $this->json($result);
+        return $this->json($result)->setEncodingOptions(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 }
